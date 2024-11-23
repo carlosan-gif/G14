@@ -1,0 +1,93 @@
+apiVersion: v1  
+kind: ConfigMap  
+metadata:  
+  name: web-content-config  
+data:  
+  index.html: |  
+    <!DOCTYPE html>  
+    <html lang="es">  
+    <head>  
+        <meta charset="UTF-8">  
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <title>Grupo 14 - AWS Arquitectura en la Nube</title>  
+        <style>  
+            body {  
+                margin: 0;  
+                padding: 0;  
+                font-family: Arial, sans-serif;  
+                background: linear-gradient(to right, #87CEFA, #4682B4);  
+                color: white;  
+                text-align: center;  
+            }  
+            h1 {  
+                font-size: 3em;  
+                margin-top: 20%;  
+                text-shadow: 2px 2px #005f73;  
+            }  
+            p {  
+                font-size: 1.5em;  
+                margin-top: 1%;  
+                color: #e0f7fa;  
+            }  
+            .footer {  
+                position: fixed;  
+                left: 0;  
+                bottom: 0;  
+                width: 100%;  
+                background-color: #4682B4;  
+                color: white;  
+                text-align: center;  
+                padding: 10px;  
+                font-size: 1em;  
+            }  
+        </style>  
+    </head>  
+    <body>  
+        <h1>Bienvenidos al Portal del Grupo 14</h1>  
+        <p>AWS Arquitectura en la Nube</p>  
+        
+        <div class="footer">  
+            &copy; 2024 Grupo 14 - Arquitectura en la Nube  
+        </div>  
+    </body>  
+    </html>  
+---  
+apiVersion: apps/v1  
+kind: Deployment  
+metadata:  
+  name: grupo14-app  
+spec:  
+  replicas: 2  
+  selector:  
+    matchLabels:  
+      app: grupo14  
+  template:  
+    metadata:  
+      labels:  
+        app: grupo14  
+    spec:  
+      containers:  
+      - name: grupo14-container  
+        image: nginx:latest  
+        volumeMounts:  
+        - mountPath: /usr/share/nginx/html  
+          name: web-content  
+        ports:  
+        - containerPort: 80  
+      volumes:  
+      - name: web-content  
+        configMap:  
+          name: web-content-config  
+---  
+apiVersion: v1  
+kind: Service  
+metadata:  
+  name: grupo14-service  
+spec:  
+  type: LoadBalancer  
+  selector:  
+    app: grupo14  
+  ports:  
+  - protocol: TCP  
+    port: 80  
+    targetPort: 80
